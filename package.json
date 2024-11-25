@@ -1,0 +1,19 @@
+{
+  "name": "modules",
+  "version": "1.0.0",
+  "main": "app.js",
+  "dependencies": {
+    "chai": "^4.3.0",
+    "mocha": "^8.2.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "keywords": [],
+  "author": "K.Kochev",
+  "license": "ISC",
+  "description": ""
+}

@@ -1,13 +1,14 @@
 const { decodeUplink, hexToDecArr } = require('./decoder');
 
-const emptyPayload ="";
+const exampleEmptyPayload = "";
+const exampleNullPayLoad = null;
 
 jest.mock('./decoder', () => ({
     decodeUplink: jest.fn(),
     hexToDecArr: jest.fn()  // Mock hexToDecArr as well
 }));
 
-test('should handle empty payload correctly', () => {
+test('should handle empty or null payload correctly', () => {
     hexToDecArr.mockReturnValue([]);
 
     const input = { bytes: hexToDecArr('') };

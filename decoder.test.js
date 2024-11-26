@@ -6,7 +6,7 @@ const allProperiesPayLoad = "041111121119111b111d11111f11112111111123112511115a1
 const oddLenghtBasicPayload = "041312011C034A241805D9E7195201898";
 const invalidCharPayload = "JP7 =0/";
 const shortPayload = "011C";
-const oneValidCharPayload = "0";
+const oneValidCharPayload = "0" + "";
 const shortDeviceVersionBasicPayload = "04011C034A241805D9E7195201";
 const maliciousScriptInjectionPayload = "3c7363726970743e616c657274282778737327293c2f7363726970743e";
 const extraLongPayload ="a9b39034".repeat(10000000);

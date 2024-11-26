@@ -1,5 +1,14 @@
 const { decodeUplink, hexToDecArr } = require('./decoder');
 
+const basicPayload = "011C034A241805D9E7195201";
+const deviceVersionBasicPayLoad = "041312011C034A241805D9E7195201";
+const allProperiesBasicPayLoad = "041111121119111b111d11111f11112111111123112511115a115c115d115f1160111161111111621111116311111170111171111172117311b111a011111111011C034A241805D9E7195201";
+const oddLenghtBasicPayload = "";
+const invalidCharBasicPayload = "";
+
+
+
+
 test('should correctly decode uplink with first payload', () => {
     const inputOne = { bytes: hexToDecArr("011C034A241805D9E7195201") };
     const expectedOutput = {

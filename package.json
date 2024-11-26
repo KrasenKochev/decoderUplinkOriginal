@@ -4,7 +4,7 @@
   "main": "app.js",
   "dependencies": {
     "chai": "^4.3.0",
-    "mocha": "^8.2.1"
+    "mocha": "^10.8.2"
   },
   "devDependencies": {
     "jest": "^29.7.0"

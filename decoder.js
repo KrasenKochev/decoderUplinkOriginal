@@ -4,7 +4,7 @@ const decodeUplink = (input) => {
         let { bytes } = input;
         let data = {};
         const handleKeepalive = (bytes, data) => {
-            data.internalTemperature = bytes[1];
+             data.internalTemperature = bytes[1];
             // Energy data
             const energy = (bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5];
             data.energy_kWh = energy / 1000;
@@ -191,28 +191,29 @@ const decodeUplink = (input) => {
         throw new Error('Unhandled data');
     }
 };
-//module.exports.decodeUplink = decodeUplink;
+
 const hexToDecArr = (hexData) => {
     return hexData.match(/.{1,2}/g).map(function (byte) { return parseInt(byte, 16); });
 };
 
-const hex = "011C034A241805D9E7195201";
-const hexTwo = "041312011C034A241805D9E7195201";
-const hexMock = "53424";
-const bytesFirstInput = hexToDecArr(hex);
-const bytesSecondInput = hexToDecArr(hexTwo);
+// const hex = "011C034A241805D9E7195201";
+// const hexTwo = "041312011C034A241805D9E7195201";
+// const hexAllValues = "041111121119111b111d11111f11112111111123112511115a115c115d115f1160111161111111621111116311111170111171111172117311b111a011111111011C034A241805D9E7195201";
+const hexMock = "=";
+// const bytesFirstInput = hexToDecArr(hex);
+// const bytesSecondInput = hexToDecArr(hexTwo);
 const bytesMock = hexToDecArr(hexMock);
-console.log("First Array", bytesFirstInput);
-console.log("Second Array", bytesSecondInput);
+// console.log("First Array", bytesFirstInput);
+// console.log("Second Array", bytesSecondInput);
 console.log("Mock Array", bytesMock);
-const input = { bytes: bytesFirstInput };
-const inputTwo = { bytes: bytesSecondInput };
+// const input = { bytes: bytesFirstInput };
+// const inputTwo = { bytes: bytesSecondInput };
 const inputMock = { bytes: bytesMock };
-const result = decodeUplink(input);
-const resultTwo = decodeUplink(inputTwo);
+// const result = decodeUplink(input);
+// const resultTwo = decodeUplink(inputTwo);
 const resultMock = decodeUplink(inputMock);
-console.log("Received Information for first payload", result);
-console.log("Received Information for second payload", resultTwo);
+// console.log("Received Information for first payload", result);
+// console.log("Received Information for second payload", resultTwo);
 console.log("Received Information for mock payload", resultMock);
 
 

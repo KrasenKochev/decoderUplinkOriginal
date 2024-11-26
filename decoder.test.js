@@ -1,6 +1,6 @@
 const { decodeUplink, hexToDecArr } = require('./decoder');
 
-test('should correctly decode uplink with firstPayload', () => {
+test('should correctly decode uplink with first payload', () => {
     const inputOne = { bytes: hexToDecArr("011C034A241805D9E7195201") };
     const expectedOutput = {
         data: {
@@ -24,7 +24,7 @@ test('should correctly decode uplink with firstPayload', () => {
     }
 });
 
-test('should correctly decode uplink with secondPayload', () => {
+test('should correctly decode uplink with second payload', () => {
     const inputTwo = { bytes: hexToDecArr("041312011C034A241805D9E7195201") };
     const expectedOutput = {
         data: {
@@ -48,3 +48,29 @@ test('should correctly decode uplink with secondPayload', () => {
         throw error;
     }
 });
+test(`should correctly decode uplink with a zero payload`,() =>{
+    const inputZero = {bytes: hexToDecArr("0") };
+    const expectedOutput = {
+        data: {
+            internalTemperature: undefined,
+            energy_kWh: 0,
+            power_W: 0,
+            acVoltage_V: undefined,
+            acCurrent_mA: 0,
+            relayState: 'OFF',
+        },
+    };
+    const result = decodeUplink(inputZero);
+
+    try {
+        expect(result).toEqual(expectedOutput);
+    } catch (error) {
+        console.error(`Test failed for input: ${inputZero.bytes}`);
+        console.error(`Expected:`, expectedOutput);
+        console.error(`Actual:`, result);
+        throw error;
+    }
+})
+
+// with invalid payload - G1H2
+

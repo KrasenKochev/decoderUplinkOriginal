@@ -7,7 +7,6 @@ const oddLenghtBasicPayload = "041312011C034A241805D9E7195201898";
 const invalidCharBasicPayload = "JP7 =0/";
 const shortPayload = "011C";
 const oneValidCharPayload = "0";
-const emptyPayload ="";
 
 test('should correctly decode uplink with valid basic payload', () => {
     const input = { bytes: hexToDecArr(basicPayload) };
@@ -18,6 +17,7 @@ test('should correctly decode uplink with valid basic payload', () => {
 
     assertBasicPayload(input);
     assertPropertyAbsent(data,`deviceVersions`)
+    assertPropertyValue(data,`relayState`,`ON`)
 
 });
 test('should be able to decode uplink with a payload containing one valid char', () => {
@@ -220,65 +220,78 @@ const assertShortPayload = (input) => {
     assertDecodedUplink(result, expectedOutput, input);
 };
 const assertPropertyPresent = (data, property) => {
-    try{
+    try {
         expect(data).toHaveProperty(property);
-    } catch(error){
-        console.error(`Test failed.`)
-        console.error(`Expected:`,property)
-        console.error(`Actual:`,data)
-        throw error;
+    } catch (error) {
+        console.error(`Test failed.`);
+        console.error(`Expected: '${property}'`);
+        console.error(`Actual:`, data);
+        throw error; 
     }
-    
 };
+
+
 const assertPropertyAbsent = (data, property) => {
     try{
         expect(data).not.toHaveProperty(property);
     } catch(error){
         console.error(`Test failed.`)
-        console.error(`Expected:`,property)
+        console.error(`Expected:'${property}'`)
         console.error(`Actual:`,data)
         throw error;
     }
 };
-const assertPropertyValue = (data, property, value) => {
-    try{
-        expect(data).toHaveProperty(property, value);
-    } catch(error){
-        console.error(`Test failed.`)
-        console.error(`Expected:`,property)
-        console.error(`Actual:`,data)
-        throw error;
-    }
-};
-const assertPropertyNoValue = (data, property) => {
-    try{
-        expect(data[property]).toBeFalsy();
-    } catch(error){
-        console.error(`Test failed.`)
-        console.error(`Expected:`,property)
-        console.error(`Actual:`,data)
-        throw error;
-    }
-};
-const assertDataIsObject = (data) => {
-    try{
-        expect(typeof data).toBe('object');
-        expect(data).not.toBeNull();
-        expect(Array.isArray(data)).toBe(false);
-    }catch(error){
-        console.error("Test failed.")
-        console.error(data,"Is not an object")
-    }
-    
-};
-const assertDataObjectPropertiesCount = (data, count) => {
-    try{
-        expect(Object.keys(data).length).toBe(count);
-    }catch(error){
-        console.error(`Test failed.`)
-        console.error(`Expected:`,data)
-        console.error(`Actual:`,count)
-    }
 
+const assertPropertyValue = (data, property, value) => {
+    let dataPropertyValue;
+    try {
+        dataPropertyValue = data[property];
+        expect(dataPropertyValue).toStrictEqual(value);
+    } catch (error) {
+        console.error(`Test failed.`)
+        console.error(`Expected property '${property}' to have value '${value}`)
+        console.error(`Actual: '${dataPropertyValue}'`);
+        throw error;
+    }
 };
+
+const assertPropertyNoValue = (data, property) => {
+    let dataProperty;
+    try {
+        dataProperty = data[property];
+        expect(dataProperty).toBeFalsy();
+    } catch (error) {
+        console.error(`Test failed.`)
+        console.error(`Expected property '${property}' to be falsy.`);
+        console.error(`Property value:`, dataProperty);
+        throw error; 
+    }
+};
+
+const assertDataIsObject = (data) => {
+    try {
+        expect(data).not.toBeNull();
+        expect(typeof data).toBe('object'); 
+        expect(Array.isArray(data)).toBe(false); 
+    } catch (error) {
+        console.error(`Test failed.`)
+        console.error("The provided value is not an object.");
+        console.error("Received:", data);
+        throw error;
+    }
+};
+
+const assertDataObjectPropertiesCount = (data, count) => {
+    try {
+        const dataLength = Object.keys(data).length;
+        expect(dataLength).toBe(count);
+    } catch (error) {
+        const dataLength = Object.keys(data).length;
+        console.error(`Test failed.`);
+        console.error(`Expected:`, count);
+        console.error(`Actual:`, dataLength);
+        throw error;
+    }
+};
+
 

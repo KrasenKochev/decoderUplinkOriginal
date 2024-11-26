@@ -4,9 +4,12 @@ const basicPayload = "011C034A241805D9E7195201";
 const deviceVersionBasicPayLoad = "041312011C034A241805D9E7195201";
 const allProperiesPayLoad = "041111121119111b111d11111f11112111111123112511115a115c115d115f1160111161111111621111116311111170111171111172117311b111a011111111011C034A241805D9E7195201";
 const oddLenghtBasicPayload = "041312011C034A241805D9E7195201898";
-const invalidCharBasicPayload = "JP7 =0/";
+const invalidCharPayload = "JP7 =0/";
 const shortPayload = "011C";
 const oneValidCharPayload = "0";
+const shortDeviceVersionBasicPayload = "04011C034A241805D9E7195201";
+const maliciousScriptInjectionPayload = "3c7363726970743e616c657274282778737327293c2f7363726970743e";
+const extraLongPayload ="a9b39034".repeat(10000000);
 
 test('should correctly decode uplink with valid basic payload', () => {
     const input = { bytes: hexToDecArr(basicPayload) };
@@ -18,6 +21,18 @@ test('should correctly decode uplink with valid basic payload', () => {
     assertBasicPayload(input);
     assertPropertyAbsent(data,`deviceVersions`)
     assertPropertyValue(data,`relayState`,`ON`)
+
+});
+test('should correctly decode uplink with malicious payload', () => {
+    const input = { bytes: hexToDecArr(maliciousScriptInjectionPayload) };
+    const data = decodeUplink(input).data;
+
+    assertDataIsObject(data);
+    assertDataObjectPropertiesCount(data, 10)
+
+    assertMaliciousPayload(input);
+    assertPropertyPresent(data,`internalTemperature`)
+    
 
 });
 test('should be able to decode uplink with a payload containing one valid char', () => {
@@ -63,7 +78,7 @@ test('should be able to read uplink with payload containing odd number of chars 
 
 });
 test('should be able ro read uplink with payload containing invalid chars in payload', () => {
-    const input = { bytes: hexToDecArr(invalidCharBasicPayload) };
+    const input = { bytes: hexToDecArr(invalidCharPayload) };
     const data = decodeUplink(input).data;
     
     assertDataIsObject(data);
@@ -86,6 +101,41 @@ test('should be able ro decode uplink with payload containing less than twenty f
     assertPropertyNoValue(data, "energy_kWh")
 
 });
+test('should be able to read uplink with missing hexes for device software and hardware versions and valid basic information in the payload', () => {
+    const input = { bytes: hexToDecArr(shortDeviceVersionBasicPayload) };
+    const data = decodeUplink(input).data;
+
+    assertDataIsObject(data);
+    assertDataObjectPropertiesCount(data, 7)
+
+    assertDeviceVersionPayloadEmpty(input);
+    assertPropertyValue(data, 'deviceVersions',{"hardware": NaN, "software": NaN});
+
+
+});
+
+/*
+this test greatly extends the testing time, so uncomment and use wisely.
+locally when payload is incremented to .10000000 instead of 1000000 , it throws "RangeError: Invalid string length"
+*/
+
+/*
+test('should be able to decode extra large payload', () => {
+    const input = { bytes: hexToDecArr(extraLongPayload) };
+    const data = decodeUplink(input).data;
+
+    assertDataIsObject(data);
+    assertDataObjectPropertiesCount(data, 6)
+
+    assertPropertyPresent(data,`internalTemperature`)
+    assertPropertyPresent(data,`energy_kWh`)
+    assertPropertyPresent(data,`power_W`)
+    assertPropertyPresent(data,`acVoltage_V`)
+    assertPropertyPresent(data,`acCurrent_mA`)
+    assertPropertyPresent(data,`relayState`)
+
+});
+*/
 
 const assertDecodedUplink = (result, expectedOutput, input) => {
     try {
@@ -111,10 +161,43 @@ const assertBasicPayload = (input) => {
     const result = decodeUplink(input);
     assertDecodedUplink(result, expectedOutput, input);
 };
+const assertMaliciousPayload = (input) => {
+    const expectedOutput = {
+        data: {
+            overpowerRecoveryTemp: NaN,
+            overcurrentRecoveryTemp: 105,
+            overheatingRecoveryTime: 29758,
+            overvoltageEvents: { events: 108, voltage: 25970 },
+            internalTemperature: 39,
+            energy_kWh: 691810.163,
+            power_W: 25458,
+            acVoltage_V: 105,
+            acCurrent_mA: 28788,
+            relayState: 'OFF'
+        },
+    };
+    const result = decodeUplink(input);
+    assertDecodedUplink(result, expectedOutput, input);
+};
 const assertDeviceVersionPayload = (input) => {
     const expectedOutput = {
         data: {
             deviceVersions: { hardware: 13, software: 12 },
+            internalTemperature: 28,
+            energy_kWh: 55190.552,
+            power_W: 1497,
+            acVoltage_V: 231,
+            acCurrent_mA: 6482,
+            relayState: 'ON'
+        },
+    };
+    const result = decodeUplink(input);
+    assertDecodedUplink(result, expectedOutput, input);
+};
+const assertDeviceVersionPayloadEmpty = (input) => {
+    const expectedOutput = {
+        data: {
+            deviceVersions: { hardware: NaN, software: NaN },
             internalTemperature: 28,
             energy_kWh: 55190.552,
             power_W: 1497,
@@ -229,8 +312,6 @@ const assertPropertyPresent = (data, property) => {
         throw error; 
     }
 };
-
-
 const assertPropertyAbsent = (data, property) => {
     try{
         expect(data).not.toHaveProperty(property);
@@ -241,7 +322,6 @@ const assertPropertyAbsent = (data, property) => {
         throw error;
     }
 };
-
 const assertPropertyValue = (data, property, value) => {
     let dataPropertyValue;
     try {
@@ -254,7 +334,6 @@ const assertPropertyValue = (data, property, value) => {
         throw error;
     }
 };
-
 const assertPropertyNoValue = (data, property) => {
     let dataProperty;
     try {
@@ -267,7 +346,6 @@ const assertPropertyNoValue = (data, property) => {
         throw error; 
     }
 };
-
 const assertDataIsObject = (data) => {
     try {
         expect(data).not.toBeNull();
@@ -280,7 +358,6 @@ const assertDataIsObject = (data) => {
         throw error;
     }
 };
-
 const assertDataObjectPropertiesCount = (data, count) => {
     try {
         const dataLength = Object.keys(data).length;
@@ -293,5 +370,3 @@ const assertDataObjectPropertiesCount = (data, count) => {
         throw error;
     }
 };
-
-
